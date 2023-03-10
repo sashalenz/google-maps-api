@@ -1,0 +1,10 @@
+<?php
+
+namespace Sashalenz\GoogleMapsApi\Enums;
+
+enum FallbackRoutingMode: string
+{
+    case FALLBACK_ROUTING_MODE_UNSPECIFIED = 'FALLBACK_ROUTING_MODE_UNSPECIFIED';
+    case FALLBACK_TRAFFIC_UNAWARE = 'FALLBACK_TRAFFIC_UNAWARE';
+    case FALLBACK_TRAFFIC_AWARE = 'FALLBACK_TRAFFIC_AWARE';
+}

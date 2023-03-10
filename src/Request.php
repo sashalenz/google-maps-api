@@ -20,6 +20,8 @@ final class Request
         private readonly string $baseUrl,
         private readonly string $method,
         private readonly array $params,
+        private readonly array $headers,
+        private readonly bool $isPost,
     ) {
     }
 
@@ -35,19 +37,29 @@ final class Request
                     self::RETRY_SLEEP
                 )
                 ->baseUrl($this->baseUrl)
-                ->asJson()
-                ->withHeaders([
-                    'X-Goog-Api-Key' => config('google-maps-api.api_key'),
-                    'X-Goog-FieldMask' => 'routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline',
-                ])
-                ->post(
-                    $this->method,
-                    $this->params
+                ->withHeaders(
+                    array_merge(
+                        ['X-Goog-Api-Key' => config('google-maps-api.api_key')],
+                        $this->headers
+                    )
                 )
+//                ->when(
+//                    $this->isPost,
+//                    fn ($request) => $request
+                        ->asJson()
+                        ->post(
+                            $this->method,
+                            $this->params
+                        )
+//                    fn ($request) => $request->get(
+//                        $this->method,
+//                        $this->params
+//                    ),
+//                )
                 ->throw()
                 ->collect();
         } catch (RequestException $e) {
-            throw new GoogleMapsApiException('API Exception: '.$e->getMessage());
+            throw new GoogleMapsApiException('API Exception: '.$e->getMessage(), $e->getCode());
         }
     }
 
@@ -62,6 +74,11 @@ final class Request
 
     private function getCacheKey(): string
     {
-        return collect(['gma', $this->method, ...$this->params])->values()->implode('_');
+        return collect([
+            'gma',
+            $this->method,
+            base64_encode(serialize($this->params)),
+        ])
+            ->implode('_');
     }
 }

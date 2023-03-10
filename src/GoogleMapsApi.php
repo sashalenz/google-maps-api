@@ -2,12 +2,12 @@
 
 namespace Sashalenz\GoogleMapsApi;
 
-use Sashalenz\GoogleMapsApi\ApiModels\Routes;
+use Sashalenz\GoogleMapsApi\ApiModels\ComputeRoutes;
 
 class GoogleMapsApi
 {
-    public static function computeRoutes(): Routes
+    public static function computeRoutes(): ComputeRoutes
     {
-        return new Routes();
+        return new ComputeRoutes();
     }
 }

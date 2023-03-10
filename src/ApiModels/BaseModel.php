@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Sashalenz\GoogleMapsApi\Exceptions\GoogleMapsApiException;
 use Sashalenz\GoogleMapsApi\Request;
+use Spatie\LaravelData\Data;
 
 abstract class BaseModel
 {
@@ -13,23 +14,31 @@ abstract class BaseModel
 
     private int $cacheSeconds = -1;
 
-    private string $baseUrl = 'https://maps.googleapis.com/maps/api/';
+    protected string $baseUrl = 'https://maps.googleapis.com/maps/api/';
 
-    private string $method = '';
+    protected string $method = '';
 
-    private array $params = [];
+    protected array $headers = [];
+
+    protected bool $isPost = true;
+
+    protected function getParams(): array
+    {
+        if (! isset($this->params)) {
+            return [];
+        }
+
+        if ($this->params instanceof Data) {
+            return $this->params->toArray();
+        }
+
+        return $this->params;
+    }
 
     public function cache(int $seconds = -1): self
     {
         $this->canBeCached = true;
         $this->cacheSeconds = $seconds;
-
-        return $this;
-    }
-
-    public function params(array $params): self
-    {
-        $this->params = array_merge($this->params, $params);
 
         return $this;
     }
@@ -40,7 +49,7 @@ abstract class BaseModel
     protected function validate(array $rules = []): self
     {
         $validator = Validator::make(
-            $this->params,
+            $this->getParams(),
             $rules
         );
 
@@ -54,12 +63,14 @@ abstract class BaseModel
     /**
      * @throws GoogleMapsApiException
      */
-    public function request(): Collection
+    protected function request(): Collection
     {
         $request = new Request(
-            $this->baseUrl,
-            $this->method,
-            $this->params,
+            baseUrl: $this->baseUrl,
+            method: $this->method,
+            params: $this->getParams(),
+            headers: $this->headers,
+            isPost: $this->isPost,
         );
 
         if ($this->canBeCached) {
