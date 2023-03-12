@@ -10,4 +10,9 @@ class GoogleMapsApi
     {
         return new ComputeRoutes();
     }
+
+    public static function computeRouteMatrix(): ComputeRoutes
+    {
+        return new ComputeRoutes();
+    }
 }

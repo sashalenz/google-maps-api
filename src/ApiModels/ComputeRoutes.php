@@ -2,6 +2,10 @@
 
 namespace Sashalenz\GoogleMapsApi\ApiModels;
 
+use DateTime;
+use Sashalenz\GoogleMapsApi\Enums\PolylineEncoding;
+use Sashalenz\GoogleMapsApi\Enums\PolylineQuality;
+use Sashalenz\GoogleMapsApi\Enums\RouteTravelMode;
 use Sashalenz\GoogleMapsApi\Enums\RoutingPreference;
 use Sashalenz\GoogleMapsApi\Enums\Units;
 use Sashalenz\GoogleMapsApi\Exceptions\GoogleMapsApiException;
@@ -11,9 +15,9 @@ use Sashalenz\GoogleMapsApi\Types\Waypoint;
 
 class ComputeRoutes extends BaseModel
 {
-    protected string $baseUrl = 'https://routes.googleapis.com/directions';
+    protected string $baseUrl = 'https://routes.googleapis.com';
 
-    protected string $method = 'v2:computeRoutes';
+    protected string $method = '/directions/v2:computeRoutes';
 
     protected ComputeRoutesParams $params;
 
@@ -28,6 +32,79 @@ class ComputeRoutes extends BaseModel
             'routingPreference' => RoutingPreference::TRAFFIC_AWARE_OPTIMAL,
             'languageCode' => 'uk-UA',
         ]);
+    }
+
+    public function travelMode(RouteTravelMode $travelMode): self
+    {
+        $this->params->travelMode = $travelMode;
+
+        return $this;
+    }
+
+    public function units(Units $units): self
+    {
+        $this->params->units = $units;
+
+        return $this;
+    }
+
+    public function routingPreference(RoutingPreference $routingPreference): self
+    {
+        $this->params->routingPreference = $routingPreference;
+
+        return $this;
+    }
+
+    public function departureTime(DateTime $departureTime): self
+    {
+        $this->params->departureTime = $departureTime;
+
+        return $this;
+    }
+
+    public function polylineQuality(PolylineQuality $polylineQuality): self
+    {
+        $this->params->polylineQuality = $polylineQuality;
+
+        return $this;
+    }
+
+    public function polylineEncoding(PolylineEncoding $polylineEncoding): self
+    {
+        $this->params->polylineEncoding = $polylineEncoding;
+
+        return $this;
+    }
+
+    public function languageCode(string $languageCode): self
+    {
+        $this->params->languageCode = $languageCode;
+
+        return $this;
+    }
+
+    public function regionCode(string $regionCode): self
+    {
+        $this->params->regionCode = $regionCode;
+
+        return $this;
+    }
+
+    public function extraComputations(...$extraComputations): self
+    {
+        $this->params->extraComputations = array_merge(
+            $this->params->extraComputations,
+            $extraComputations
+        );
+
+        return $this;
+    }
+
+    public function computeAlternativeRoutes(): self
+    {
+        $this->params->computeAlternativeRoutes = true;
+
+        return $this;
     }
 
     public function originLocation(string $latitude, string $longitude): self
@@ -99,11 +176,6 @@ class ComputeRoutes extends BaseModel
      */
     public function get(): ComputeRoutesResponse
     {
-        $resp = $this->request();
-        ray($resp);
-
-        return ComputeRoutesResponse::from(
-            $resp
-        );
+        return ComputeRoutesResponse::from($this->request());
     }
 }
