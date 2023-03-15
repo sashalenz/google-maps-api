@@ -43,19 +43,19 @@ final class Request
                         $this->headers
                     )
                 )
-//                ->when(
-//                    $this->isPost,
-//                    fn ($request) => $request
+                ->when(
+                    $this->isPost,
+                    fn ($request) => $request
                         ->asJson()
                         ->post(
                             $this->method,
                             $this->params
-                        )
-//                    fn ($request) => $request->get(
-//                        $this->method,
-//                        $this->params
-//                    ),
-//                )
+                        ),
+                    fn ($request) => $request->get(
+                        $this->method,
+                        $this->params
+                    ),
+                )
                 ->throw()
                 ->collect();
         } catch (RequestException $e) {
